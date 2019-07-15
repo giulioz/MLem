@@ -14,7 +14,8 @@ exp -> value                           {% nth(0) %}
      | parens                          {% nth(0) %}
      | let                             {% nth(0) %}
 
-let -> "let" __ ident _ "=" _ exp __ "in" __ exp   {% d => ({type: "let", ident: d[2], value: d[6], in: d[10]}) %}
+let -> "let" __ ident _ "=" _ exp __ "in" __ exp       {% d => ({type: "let", ident: d[2], value: d[6], in: d[10]}) %}
+     | "let" __ ident _ "=" _ exp __ let               {% d => ({type: "let", ident: d[2], value: d[6], in: d[8]}) %}
 
 parens -> "(" exp ")"                  {% nth(1) %}
 
@@ -33,7 +34,7 @@ string -> "\"\""                       {% () => "" %}
         | "\"" chars "\""              {% nth(1) %}
 
 chars -> char                          {% id %}
-       | char chars                    {% merge %}
+       | char chars                    {% d => ({ value: d[0], next: d[1]}) %}
 
 char -> [^"\\\x00-\x1F\x7F]            {% id %}
       | "\\\""                         {% () => "\"" %}

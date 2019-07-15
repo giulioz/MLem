@@ -66,6 +66,7 @@ function evaluate(exp, scope) {
       });
 
     case "lambda":
+      // Lift lambda
       return { ...exp, scope };
   }
 }
