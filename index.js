@@ -11,7 +11,20 @@ if (parser.results.length > 1) {
 }
 
 const builtIn = {
-  inc: x => x + 1
+  inc: {
+    type: "lambda",
+    variable: "x",
+    value: scope => scope["x"] + 1
+  },
+  sum: {
+    type: "lambda",
+    variable: "x",
+    value: {
+      type: "lambda",
+      variable: "y",
+      value: scope => scope["x"] + scope["y"]
+    }
+  }
 };
 
 function evaluate(exp, scope) {
@@ -23,32 +36,25 @@ function evaluate(exp, scope) {
 
     case "ident":
       if (scope[exp.name] === undefined) {
-        throw new Error("No identifier ", exp.name);
+        throw new Error("No identifier " + exp.name);
       }
 
       return scope[exp.name];
 
     case "app":
       const param = evaluate(exp.param, scope);
+      const fn = evaluate(exp.fn, scope);
+      const newScope = {
+        ...scope,
+        ...fn.scope,
+        [fn.variable]: param
+      };
 
-      if (exp.fn.type === "lambda") {
-        return evaluate(exp.fn.value, {
-          ...scope,
-          [exp.fn.variable]: param
-        });
-      } else if (exp.fn.type === "ident") {
-        const fn = evaluate(exp.fn, scope);
-
-        if (typeof fn === "function") {
-          return fn(param);
-        } else {
-          return evaluate(fn.value, {
-            ...scope,
-            [fn.variable]: param
-          });
-        }
+      if (typeof fn.value === "function") {
+        // Builtin
+        return fn.value(newScope);
       } else {
-        throw new Error("Not a function");
+        return evaluate(fn.value, newScope);
       }
 
     case "let":
@@ -60,7 +66,7 @@ function evaluate(exp, scope) {
       });
 
     case "lambda":
-      return exp;
+      return { ...exp, scope };
   }
 }
 
