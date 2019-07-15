@@ -42,9 +42,9 @@ function evaluate(exp, scope) {
         if (typeof fn === "function") {
           return fn(param);
         } else {
-          return evaluate(exp.fn.value, {
+          return evaluate(fn.value, {
             ...scope,
-            [exp.fn.variable]: param
+            [fn.variable]: param
           });
         }
       } else {

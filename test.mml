@@ -1,2 +1,3 @@
-let three = inc 2
-in (inc three)
+let three = inc 2 in
+let ident = (\x -> x) in
+(ident (inc three))
