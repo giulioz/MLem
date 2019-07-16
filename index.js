@@ -57,7 +57,7 @@ function evaluate(exp, scope) {
         throw new Error("No identifier " + exp.name);
       }
 
-    case "app":
+    case "app": {
       const param = evaluate(exp.param, scope);
       const fn = evaluate(exp.fn, scope);
       const newScope = {
@@ -78,16 +78,18 @@ function evaluate(exp, scope) {
       } else {
         return evaluate(fn.value, newScope);
       }
+    }
 
-    case "let":
+    case "let": {
       const value = evaluate(exp.value, scope);
 
       return evaluate(exp.in, {
         bindings: { ...scope.bindings, [exp.ident]: value },
         types: scope.types
       });
+    }
 
-    case "type":
+    case "type": {
       function buildConstructor(name, data) {
         if (data.length <= 0) {
           return { type: exp.ident, name, value: null };
@@ -113,10 +115,27 @@ function evaluate(exp, scope) {
         bindings: { ...scope.bindings, ...constructors },
         types: { ...scope.types, [exp.ident]: exp.value }
       });
+    }
 
     case "lambda":
       // Lift lambda
       return { ...exp, scope };
+
+    case "match": {
+      function matchesCase(value, c) {
+        return c.case === undefined || value.value == c.case.value;
+      }
+
+      const value = evaluate(exp.value, scope);
+      const mcases = exp.cases.filter(c => matchesCase(value, c));
+
+      const firstCase = mcases[0];
+      if (firstCase === undefined) {
+        throw new Error("No case match");
+      } else {
+        return evaluate(firstCase.value, scope);
+      }
+    }
 
     default:
       return exp.value;

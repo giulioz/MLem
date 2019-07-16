@@ -1,1 +1,6 @@
-readFile "test.mml"
+type Boolean = true | false;
+let value = 42;
+
+match value with
+| 42 -> true
+| _ -> false
