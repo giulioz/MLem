@@ -11,43 +11,49 @@ if (parser.results.length > 1) {
 }
 
 const builtIn = {
-  inc: {
-    type: "lambda",
-    variable: "x",
-    value: scope => scope["x"] + 1
-  },
-  sum: {
-    type: "lambda",
-    variable: "x",
-    value: {
+  bindings: {
+    inc: {
       type: "lambda",
-      variable: "y",
-      value: scope => scope["x"] + scope["y"]
+      variable: "x",
+      value: scope => scope.bindings["x"] + 1
+    },
+    sum: {
+      type: "lambda",
+      variable: "x",
+      value: {
+        type: "lambda",
+        variable: "y",
+        value: scope => scope.bindings["x"] + scope.bindings["y"]
+      }
     }
   }
 };
 
 function evaluate(exp, scope) {
   switch (exp.type) {
-    case "number":
-    case "string":
-    case "boolean":
-      return exp.value;
+    case "tuple":
+      return exp.items.map(item => evaluate(item, scope));
 
     case "ident":
-      if (scope[exp.name] === undefined) {
+      if (scope.bindings[exp.name] !== undefined) {
+        return scope.bindings[exp.name];
+      } else {
         throw new Error("No identifier " + exp.name);
       }
-
-      return scope[exp.name];
 
     case "app":
       const param = evaluate(exp.param, scope);
       const fn = evaluate(exp.fn, scope);
       const newScope = {
-        ...scope,
-        ...fn.scope,
-        [fn.variable]: param
+        bindings: {
+          ...scope.bindings,
+          ...(fn.scope ? fn.scope.bindings : {}),
+          [fn.variable]: param
+        },
+        types: {
+          ...scope.types,
+          ...(fn.scope ? fn.scope.types : {})
+        }
       };
 
       if (typeof fn.value === "function") {
@@ -61,13 +67,43 @@ function evaluate(exp, scope) {
       const value = evaluate(exp.value, scope);
 
       return evaluate(exp.in, {
-        ...scope,
-        [exp.ident]: value
+        bindings: { ...scope.bindings, [exp.ident]: value },
+        types: scope.types
+      });
+
+    case "type":
+      function buildConstructor(name, data) {
+        if (data.length <= 0) {
+          return { type: exp.ident, name, value: null };
+        } else {
+          return {
+            type: "lambda",
+            variable: "_data",
+            value: scope => ({
+              type: exp.ident,
+              name,
+              value: scope.bindings["_data"]
+            })
+          };
+        }
+      }
+
+      const constructors = Object.keys(exp.value).reduce(
+        (prev, v) => ({ ...prev, [v]: buildConstructor(v, exp.value[v]) }),
+        {}
+      );
+
+      return evaluate(exp.in, {
+        bindings: { ...scope.bindings, ...constructors },
+        types: { ...scope.types, [exp.ident]: exp.value }
       });
 
     case "lambda":
       // Lift lambda
       return { ...exp, scope };
+
+    default:
+      return exp.value;
   }
 }
 

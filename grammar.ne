@@ -7,23 +7,42 @@
 
 file -> _ exp _                        {% nth(1) %}
 
-exp -> value                           {% nth(0) %}
-     | ident                           {% d => ({type: "ident", name: d[0]}) %}
-     | lambda                          {% nth(0) %}
-     | app                             {% nth(0) %}
-     | parens                          {% nth(0) %}
-     | let                             {% nth(0) %}
+exp -> exp2                            {% nth(0) %}
+     | tuple                           {% nth(0) %}
 
-let -> "let" __ ident _ "=" _ exp __ "in" __ exp       {% d => ({type: "let", ident: d[2], value: d[6], in: d[10]}) %}
-     | "let" __ ident _ "=" _ exp __ let               {% d => ({type: "let", ident: d[2], value: d[6], in: d[8]}) %}
+exp2 -> value                          {% nth(0) %}
+      | ident                          {% d => ({type: "ident", name: d[0]}) %}
+      | lambda                         {% nth(0) %}
+      | app                            {% nth(0) %}
+      | parens                         {% nth(0) %}
+      | let                            {% nth(0) %}
+      | type                           {% nth(0) %}
 
+type -> "type" __ ident _ "=" _ typeExp sep exp   {% d => ({type: "type", ident: d[2], value: d[6], in: d[8]}) %}
+
+typeExp -> typeExp2                    {% d => d[0] %}
+         | typeExp2 _ "|" _ typeExp    {% d => ({...d[0], ...d[4]}) %}
+
+typeExp2 -> ident                      {% d => ({[d[0]]: []}) %}
+          | ident __ "of" __ algT      {% d => ({[d[0]]: d[4]}) %}
+
+algT -> ident                          {% d => [d[0]] %}
+      | ident _ "*" _ algT             {% d => [d[0], ...d[4]] %}
+
+let -> "let" __ ident _ "=" _ exp sep exp         {% d => ({type: "let", ident: d[2], value: d[6], in: d[8]}) %}
+
+sn -> ["\n"]:*
+sep -> __ "in" __ | _ ";" _
 parens -> "(" exp ")"                  {% nth(1) %}
+
+tuple -> exp2 _ "," _ exp2             {% d => ({type: "tuple", items: [d[0], d[4]]}) %}
+       | exp2 _ "," _ tuple            {% d => ({type: "tuple", items: [d[0], ...d[4].items]}) %}
 
 lambda -> "\\" ident _ "->" _ exp      {% d => ({type: "lambda", variable: d[1], value: d[5]}) %}
 
 app -> exp __ exp                      {% d => ({type: "app", fn: d[0], param: d[2]}) %}
 
-ident -> [a-z,A-Z] [a-z,A-Z,0-9]:*     {% d => d[0] + merge(d[1]) %}
+ident -> [a-zA-Z] [a-zA-Z0-9]:*        {% d => d[0] + merge(d[1]) %}
 
 value -> string                        {% d => ({type: "string", value: d[0]}) %}
        | number                        {% d => ({type: "number", value: parseFloat(d[0])}) %}
