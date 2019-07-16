@@ -52,7 +52,7 @@ value -> string                        {% d => ({type: "string", value: d[0]}) %
 string -> "\"\""                       {% () => "" %}
         | "\"" chars "\""              {% nth(1) %}
 
-chars -> char                          {% id %}
+chars -> char                          {% d => ({ value: d[0]}) %}
        | char chars                    {% d => ({ value: d[0], next: d[1]}) %}
 
 char -> [^"\\\x00-\x1F\x7F]            {% id %}

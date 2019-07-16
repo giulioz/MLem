@@ -60,7 +60,7 @@ var grammar = {
     {"name": "string$string$1", "symbols": [{"literal":"\""}, {"literal":"\""}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "string", "symbols": ["string$string$1"], "postprocess": () => ""},
     {"name": "string", "symbols": [{"literal":"\""}, "chars", {"literal":"\""}], "postprocess": nth(1)},
-    {"name": "chars", "symbols": ["char"], "postprocess": id},
+    {"name": "chars", "symbols": ["char"], "postprocess": d => ({ value: d[0]})},
     {"name": "chars", "symbols": ["char", "chars"], "postprocess": d => ({ value: d[0], next: d[1]})},
     {"name": "char", "symbols": [/[^"\\\x00-\x1F\x7F]/], "postprocess": id},
     {"name": "char$string$1", "symbols": [{"literal":"\\"}, {"literal":"\""}], "postprocess": function joiner(d) {return d.join('');}},

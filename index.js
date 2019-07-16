@@ -10,6 +10,14 @@ if (parser.results.length > 1) {
   console.log("Error! Indecidible syntax");
 }
 
+function joinString(exp) {
+  if (exp.next === undefined) {
+    return exp.value;
+  } else {
+    return exp.value + joinString(exp.next);
+  }
+}
+
 const builtIn = {
   bindings: {
     inc: {
@@ -25,6 +33,14 @@ const builtIn = {
         variable: "y",
         value: scope => scope.bindings["x"] + scope.bindings["y"]
       }
+    },
+    readFile: {
+      type: "lambda",
+      variable: "fileName",
+      value: scope => ({
+        type: "string",
+        value: fs.readFileSync(joinString(scope.bindings["fileName"]), "utf8")
+      })
     }
   }
 };

@@ -1,2 +1,1 @@
-type MyUnion = A of int * int | B of int | C;
-((A (12,3)), (B 13), C)
+readFile "test.mml"
