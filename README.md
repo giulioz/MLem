@@ -38,7 +38,7 @@ match exp with
 - Custom Types:
 ```
 type Boolean = true | false;
-type MaybeTwo = Just number * number | Nothing;
+type MaybeTwo = Just of number * number | Nothing;
 ```
 
 Use Y Combinator for recursion (native recursion not yet supported).
@@ -46,11 +46,9 @@ Use Y Combinator for recursion (native recursion not yet supported).
 #### Example program
 
 ```
-let three = inc 2 in
-let ident = (\x -> x) in
-(ident (inc three))
-
 type Boolean = true | false;
+type MaybeTwo = Just of number * number | Nothing;
+
 let Y = \f -> ((\x -> (x x)) (\y -> (f (\x -> ((y y) x)))));
 let sub = \x -> \y -> (sum x (neg y));
 
