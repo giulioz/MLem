@@ -1,4 +1,4 @@
-# TinyML
+# MLem
 
 ### Syntax
 
