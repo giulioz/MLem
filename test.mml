@@ -1,11 +1,15 @@
 type Boolean = true | false;
-let sub = (\x -> (\y -> ((sum x) (neg y))));
+let sub = \x -> \y -> ((sum x) (neg y));
 
 let fibonacci = (\x -> 
   match x with
   | 0 -> 0
   | 1 -> 1
-  | x -> 42
+  | x -> (
+    let a = sub x 1;
+    let b = sub x 2;
+    fibonacci a b
+  )
 );
 
-fibonacci 1
+fibonacci 10

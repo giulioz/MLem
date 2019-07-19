@@ -1,3 +1,5 @@
+@preprocessor typescript
+
 @{%
     const merge = d => d.join('');
     const nth = n => d => d[n];
@@ -44,7 +46,7 @@ msp -> _ "|" _
 matchCase -> exp5 _ "->" _ exp5        {% d => ({case: d[0], value: d[4]}) %}
            | "_" _ "->" _ exp5         {% d => ({value: d[4]}) %}
 
-let -> "let" __ ident _ "=" _ exp4 sep exp       {% d => ({type: "let", ident: d[2], value: d[6], in: d[8]}) %}
+let -> "let" __ ident _ "=" _ exp2 sep exp       {% d => ({type: "let", ident: d[2], value: d[6], in: d[8]}) %}
 
 sn -> ["\n"]:*
 sep -> __ "in" __ | _ ";" _
@@ -55,7 +57,7 @@ tuple -> exp3 _ "," _ exp3             {% d => ({type: "tuple", items: [d[0], d[
 
 lambda -> "\\" ident _ "->" _ exp      {% d => ({type: "lambda", variable: d[1], value: d[5]}) %}
 
-app -> exp5 __ exp5                    {% d => ({type: "app", fn: d[0], param: d[2]}) %}
+app -> exp4 __ exp5                    {% d => ({type: "app", fn: d[0], param: d[2]}) %}
 
 ident -> [a-zA-Z] [a-zA-Z0-9]:*        {% d => d[0] + merge(d[1]) %}
 
