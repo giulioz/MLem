@@ -1,7 +1,8 @@
 type Boolean = true | false;
 
-let t = (1,true);
+let t = (1, true, 5);
 match t with
-| (1, false) -> 4
-| (1, true) -> 3
+| (1, false, 2) -> 4
+| (1, true, 4) -> 3
+| (1, true, x) -> x
 | _ -> false
