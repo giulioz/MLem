@@ -79,6 +79,12 @@ const builtIn = {
         returnType: "number"
       }
     },
+    neg: {
+      type: "lambda",
+      variable: "x",
+      value: (scope: Scope) => -scope.bindings["x"],
+      returnType: "number"
+    },
     readFile: {
       type: "lambda",
       variable: "fileName",
@@ -287,7 +293,6 @@ function evaluate(exp: Expression, scope: Scope): Expression {
           return scope;
         } else if (c.type === "ident") {
           if (scope.bindings[c.name] === undefined) {
-            // new ident
             return {
               ...scope,
               bindings: {
@@ -296,8 +301,7 @@ function evaluate(exp: Expression, scope: Scope): Expression {
               }
             };
           } else {
-            // custom type: TODO
-            return null;
+            return scope.bindings[c.name] === value ? scope : null;
           }
         } else if (c.type !== value.type) {
           return null;

@@ -1,7 +1,7 @@
 type Boolean = true | false;
 
-let t = (1,2);
+let t = (1,true);
 match t with
-| 42 -> true
-| (a, b) -> (b,a)
+| (1, false) -> 4
+| (1, true) -> 3
 | _ -> false
