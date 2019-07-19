@@ -1,3 +1,5 @@
+@preprocessor typescript
+
 @{%
     const merge = d => d.join('');
     const nth = n => d => d[n];
