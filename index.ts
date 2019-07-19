@@ -99,7 +99,10 @@ const builtIn = {
       variable: "fileName",
       value: (scope: Scope) => ({
         type: "string",
-        value: readFileSync(joinString(scope.bindings["fileName"].value), "utf8"),
+        value: readFileSync(
+          joinString(scope.bindings["fileName"].value),
+          "utf8"
+        ),
         returnType: "string"
       })
     }
@@ -251,6 +254,7 @@ function evaluate(exp: Expression, scope: Scope): Expression {
         ...scope,
         bindings: { ...scope.bindings, [exp.ident]: value }
       };
+      // console.log("LET: ", exp.ident, " = ", value);
 
       return evaluate(exp.in, newScope);
     }

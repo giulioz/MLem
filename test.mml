@@ -1,15 +1,18 @@
-type Boolean = true | false;
-let sub = \x -> \y -> ((sum x) (neg y));
+let Y = \f -> ((\x -> (x x)) (\y -> (f (\x -> ((y y) x)))));
 
-let fibonacci = (\x -> 
+let sub = \x -> \y -> (sum x (neg y));
+
+let fibonacci = Y (\f -> \x -> 
   match x with
   | 0 -> 0
   | 1 -> 1
   | x -> (
-    let a = sub x 1;
-    let b = sub x 2;
-    fibonacci a b
+    let a = (sub x) 1;
+    let b = (sub x) 2;
+    let fa = f a;
+    let fb = f b;
+    sum fa fb
   )
 );
 
-fibonacci 10
+fibonacci 8
