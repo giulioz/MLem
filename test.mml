@@ -1,3 +1,11 @@
+type Boolean = true | false;
 let sub = (\x -> (\y -> ((sum x) (neg y))));
 
-((sub 5) 3)
+let fibonacci = (\x -> 
+  match x with
+  | 0 -> 0
+  | 1 -> 1
+  | x -> 42
+);
+
+fibonacci 1
