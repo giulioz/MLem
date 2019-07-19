@@ -1,5 +1,9 @@
 # MLem
 
+**Meta Language Extensions and Manipulation**
+
+![logo](logo.png)
+
 ### Syntax
 
 Whole program is a big expression, use parentheses to avoid ambiguities.
