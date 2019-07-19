@@ -1,5 +1,5 @@
+type Boolean = true | false;
 let Y = \f -> ((\x -> (x x)) (\y -> (f (\x -> ((y y) x)))));
-
 let sub = \x -> \y -> (sum x (neg y));
 
 let fibonacci = Y (\f -> \x -> 
@@ -15,4 +15,6 @@ let fibonacci = Y (\f -> \x ->
   )
 );
 
-fibonacci 8
+match (fibonacci 8) with
+| 21 -> true
+| _ -> false
