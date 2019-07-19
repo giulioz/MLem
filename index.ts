@@ -66,7 +66,10 @@ const builtIn = {
     inc: {
       type: "lambda",
       variable: "x",
-      value: (scope: Scope) => scope.bindings["x"] + 1,
+      value: (scope: Scope) => ({
+        type: "number",
+        value: scope.bindings["x"].value + 1
+      }),
       returnType: "number"
     },
     sum: {
@@ -75,14 +78,20 @@ const builtIn = {
       value: {
         type: "lambda",
         variable: "y",
-        value: (scope: Scope) => scope.bindings["x"] + scope.bindings["y"],
+        value: (scope: Scope) => ({
+          type: "number",
+          value: scope.bindings["x"].value + scope.bindings["y"].value
+        }),
         returnType: "number"
       }
     },
     neg: {
       type: "lambda",
       variable: "x",
-      value: (scope: Scope) => -scope.bindings["x"],
+      value: (scope: Scope) => ({
+        type: "number",
+        value: -scope.bindings["x"].value
+      }),
       returnType: "number"
     },
     readFile: {
@@ -90,7 +99,7 @@ const builtIn = {
       variable: "fileName",
       value: (scope: Scope) => ({
         type: "string",
-        value: readFileSync(joinString(scope.bindings["fileName"]), "utf8"),
+        value: readFileSync(joinString(scope.bindings["fileName"].value), "utf8"),
         returnType: "string"
       })
     }
