@@ -54,7 +54,7 @@ type Boolean = true | false;
 let Y = \f -> ((\x -> (x x)) (\y -> (f (\x -> ((y y) x)))));
 let sub = \x -> \y -> (sum x (neg y));
 
-let fibonacci = Y (\f -> \x -> 
+let fibonacci = Y (\f -> \x ->
   match x with
   | 0 -> 0
   | 1 -> 1
