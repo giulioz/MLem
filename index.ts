@@ -3,7 +3,7 @@ import { Parser, Grammar } from "nearley";
 import * as grammar from "./grammar";
 
 type Scope = {
-  bindings: { [ident: string]: any };
+  bindings: { [ident: string]: Expression };
   types: { [name: string]: any };
   schemas: any;
 };
@@ -29,6 +29,7 @@ type LambdaExpression = {
   variable: string;
   value: Expression | BuiltinExpFunction;
   scope?: Scope;
+  returnType?: string;
 };
 type BuiltinExpFunction = (scope: Scope) => Expression;
 type AppExpression = {
@@ -59,7 +60,7 @@ function joinString(exp: StringChain) {
   }
 }
 
-const builtIn = {
+const builtIn: Scope = {
   types: [],
   schemas: [],
   bindings: {
@@ -68,7 +69,7 @@ const builtIn = {
       variable: "x",
       value: (scope: Scope) => ({
         type: "number",
-        value: scope.bindings["x"].value + 1
+        value: (scope.bindings["x"] as NumberExpression).value + 1
       }),
       returnType: "number"
     },
@@ -80,7 +81,9 @@ const builtIn = {
         variable: "y",
         value: (scope: Scope) => ({
           type: "number",
-          value: scope.bindings["x"].value + scope.bindings["y"].value
+          value:
+            (scope.bindings["x"] as NumberExpression).value +
+            (scope.bindings["y"] as NumberExpression).value
         }),
         returnType: "number"
       }
@@ -90,22 +93,22 @@ const builtIn = {
       variable: "x",
       value: (scope: Scope) => ({
         type: "number",
-        value: -scope.bindings["x"].value
+        value: -(scope.bindings["x"] as NumberExpression).value
       }),
       returnType: "number"
-    },
-    readFile: {
-      type: "lambda",
-      variable: "fileName",
-      value: (scope: Scope) => ({
-        type: "string",
-        value: readFileSync(
-          joinString(scope.bindings["fileName"].value),
-          "utf8"
-        ),
-        returnType: "string"
-      })
     }
+    // readFile: {
+    //   type: "lambda",
+    //   variable: "fileName",
+    //   value: (scope: Scope) => ({
+    //     type: "string",
+    //     value: readFileSync(
+    //       joinString((scope.bindings["fileName"] as StringExpression).value),
+    //       "utf8"
+    //     ),
+    //     returnType: "string"
+    //   })
+    // }
   }
 };
 
@@ -274,11 +277,7 @@ function evaluate(exp: Expression, scope: Scope): Expression {
             value: (scope: Scope) => ({
               type: exp.ident,
               name,
-              value: {
-                type: exp.ident,
-                value: name,
-                data: scope.bindings["_data"]
-              }
+              data: scope.bindings["_data"]
             })
           };
         }
@@ -301,55 +300,54 @@ function evaluate(exp: Expression, scope: Scope): Expression {
       return { ...exp, scope };
 
     case "match": {
-      function matchCase(value: Expression, c: Expression): Scope | null {
-        if (c === undefined) {
-          return scope;
-        } else if (c.type === "ident") {
-          if (scope.bindings[c.name] === undefined) {
-            return {
-              ...scope,
-              bindings: {
-                ...scope.bindings,
-                [c.name]: value
-              }
-            };
-          } else {
-            return scope.bindings[c.name] === value ? scope : null;
-          }
-        } else if (c.type !== value.type) {
+      function matchCase(value: Expression, c: MatchCase): Expression | null {
+        if (c.case === undefined) {
+          return evaluate(c.value, scope);
+        } else if (c.case.type === "ident") {
+          return evaluate(c.value, {
+            ...scope,
+            bindings: { ...scope.bindings, [c.case.name]: value }
+          });
+        } else if (
+          c.case.type === "app" &&
+          c.case.fn.type == "ident" &&
+          scope.bindings[c.case.fn.name] !== undefined &&
+          (value as any).name === c.case.fn.name
+        ) {
+          // HACK
+          return matchCase((value as any).data, {
+            case: c.case.param,
+            value: c.value
+          });
+        } else if (c.case.type !== value.type) {
           return null;
         } else if (
-          c.type === "number" &&
+          c.case.type === "number" &&
           value.type === "number" &&
-          c.value === value.value
+          c.case.value === value.value
         ) {
-          return scope;
+          return evaluate(c.value, scope);
         } else if (
-          c.type === "string" &&
+          c.case.type === "string" &&
           value.type === "string" &&
-          joinString(c.value) === joinString(value.value)
+          joinString(c.case.value) === joinString(value.value)
         ) {
-          return scope;
+          return evaluate(c.value, scope);
         } else if (
-          c.type === "tuple" &&
+          c.case.type === "tuple" &&
           value.type === "tuple" &&
-          c.items.length === value.items.length
+          c.case.items.length === value.items.length
         ) {
-          const tupleMatches = c.items.map((caseItem, i) =>
-            matchCase(value.items[i], caseItem)
+          const tupleMatches = c.case.items.map((caseItem, i) =>
+            matchCase(value.items[i], { case: caseItem, value: c.value })
           );
+
           if (tupleMatches.some(v => v === null)) {
             return null;
           } else {
             return {
-              ...scope,
-              bindings: {
-                ...scope.bindings,
-                ...tupleMatches.reduce(
-                  (bnds, scope) => ({ ...bnds, ...scope.bindings }),
-                  {}
-                )
-              }
+              type: "tuple",
+              items: tupleMatches
             };
           }
         } else {
@@ -358,18 +356,14 @@ function evaluate(exp: Expression, scope: Scope): Expression {
       }
 
       const value = evaluate(exp.value, scope);
-      const mcases = exp.cases
-        .map(
-          c => [matchCase(value, c.case), c.value] as [Scope | null, Expression]
-        )
-        .filter(v => v[0] !== null);
-
-      const [firstCaseScope, firstCaseValue] = mcases[0];
-      if (firstCaseScope === undefined) {
-        throw new Error("No case match");
-      } else {
-        return evaluate(firstCaseValue, firstCaseScope);
+      for (const c of exp.cases) {
+        const result = matchCase(value, c);
+        if (result !== null) {
+          return result;
+        }
       }
+
+      throw new Error("No case match");
     }
 
     default:
@@ -378,12 +372,12 @@ function evaluate(exp: Expression, scope: Scope): Expression {
 }
 
 const parser = new Parser(Grammar.fromCompiled(grammar));
-parser.feed(readFileSync("test.mml", "utf8"));
+parser.feed(readFileSync(process.argv[2], "utf8"));
 if (parser.results.length > 1) {
   console.log("Warning! Ambiguous syntax");
 }
 
 const value = evaluate(parser.results[0], builtIn);
-console.log("Value: ", value);
+console.log("Value: ", JSON.stringify(value, null, 2));
 // const type = getType(parser.results[0], builtIn);
 // console.log("Type: ", type);

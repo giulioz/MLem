@@ -1,0 +1,13 @@
+let Y = \f -> ((\x -> (x x)) (\y -> (f (\x -> ((y y) x)))));
+
+type List = ListNode of number * List | ListEnd;
+
+let sumList = Y (\f -> \lst -> (
+  match lst with
+  | ListNode (x, xs) -> ((sum x) (f xs))
+  | ListEnd -> 0
+));
+
+let lst = ListNode (2, ListNode (3, ListEnd));
+
+sumList lst

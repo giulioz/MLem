@@ -67,7 +67,7 @@ export var ParserRules: NearleyRule[] = [
     {"name": "matchCases", "symbols": ["matchCase", "msp", "matchCases"], "postprocess": d => [d[0], ...d[2]]},
     {"name": "msp", "symbols": ["_", {"literal":"|"}, "_"]},
     {"name": "matchCase$string$1", "symbols": [{"literal":"-"}, {"literal":">"}], "postprocess": (d) => d.join('')},
-    {"name": "matchCase", "symbols": ["exp5", "_", "matchCase$string$1", "_", "exp5"], "postprocess": d => ({case: d[0], value: d[4]})},
+    {"name": "matchCase", "symbols": ["exp4", "_", "matchCase$string$1", "_", "exp5"], "postprocess": d => ({case: d[0], value: d[4]})},
     {"name": "matchCase$string$2", "symbols": [{"literal":"-"}, {"literal":">"}], "postprocess": (d) => d.join('')},
     {"name": "matchCase", "symbols": [{"literal":"_"}, "_", "matchCase$string$2", "_", "exp5"], "postprocess": d => ({value: d[4]})},
     {"name": "let$string$1", "symbols": [{"literal":"l"}, {"literal":"e"}, {"literal":"t"}], "postprocess": (d) => d.join('')},

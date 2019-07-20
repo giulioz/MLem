@@ -43,14 +43,14 @@ match -> "match" __ exp5 __ "with" __ ("|" _ | null) matchCases {% d => ({type: 
 matchCases -> matchCase                {% d => [d[0]] %}
             | matchCase msp matchCases {% d => [d[0], ...d[2]] %}
 msp -> _ "|" _
-matchCase -> exp5 _ "->" _ exp5        {% d => ({case: d[0], value: d[4]}) %}
+matchCase -> exp4 _ "->" _ exp5        {% d => ({case: d[0], value: d[4]}) %}
            | "_" _ "->" _ exp5         {% d => ({value: d[4]}) %}
 
 let -> "let" __ ident _ "=" _ exp2 sep exp       {% d => ({type: "let", ident: d[2], value: d[6], in: d[8]}) %}
 
 sn -> ["\n"]:*
 sep -> __ "in" __ | _ ";" _
-parens -> "(" file ")"                  {% nth(1) %}
+parens -> "(" file ")"                 {% nth(1) %}
 
 tuple -> exp3 _ "," _ exp3             {% d => ({type: "tuple", items: [d[0], d[4]]}) %}
        | exp3 _ "," _ tuple            {% d => ({type: "tuple", items: [d[0], ...d[4].items]}) %}
