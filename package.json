@@ -6,7 +6,7 @@
   "dependencies": {
     "@types/nearley": "^2.11.0",
     "@types/node": "^12.6.8",
-    "nearley": "^2.16.0",
+    "nearley": "^2.19.2",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"
   },
