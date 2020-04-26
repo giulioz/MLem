@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@types/nearley/-/nearley-2.11.0.tgz#308fd197fdd6d76c52c4ca6f5bb8f42073afa91b"
   integrity sha512-sW7qB59pz+AJCpiT3ivsMMsr/5stuCUf4IC22QfhYAMItBy3XSjyzCa/oRG+oTTzYnx5VuPtPNHN4fZ0QRnKDg==
 
-"@types/node@^12.6.8":
-  version "12.6.8"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.6.8.tgz#e469b4bf9d1c9832aee4907ba8a051494357c12c"
-  integrity sha512-aX+gFgA5GHcDi89KG5keey2zf0WfZk/HAQotEamsK2kbey+8yGKcson0hbK8E+v0NArlCJQCqMP161YhV6ZXLg==
+"@types/node@^13.13.3":
+  version "13.13.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.3.tgz#385263e71ff584729ced140a935f3d029e3c8d1e"
+  integrity sha512-FiVARmwSn2s0nXKJM9V7jWtGiSeUc58dxIRIhLPrPZTPRUEoHMK7BDEo0XWxQ9vNflxoUQlGDBn9/gLxORzLKQ==
 
 arg@^4.1.0:
   version "4.1.1"
