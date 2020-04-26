@@ -5,7 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/nearley": "^2.11.0",
-    "@types/node": "^12.6.8",
+    "@types/node": "^13.13.3",
     "nearley": "^2.16.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"
