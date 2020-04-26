@@ -7,7 +7,7 @@
     "@types/nearley": "^2.11.0",
     "@types/node": "^12.6.8",
     "nearley": "^2.16.0",
-    "ts-node": "^8.3.0",
+    "ts-node": "^8.9.1",
     "typescript": "^3.5.3"
   },
   "scripts": {
