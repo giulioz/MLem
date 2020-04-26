@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@types/nearley@^2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@types/nearley/-/nearley-2.11.0.tgz#308fd197fdd6d76c52c4ca6f5bb8f42073afa91b"
-  integrity sha512-sW7qB59pz+AJCpiT3ivsMMsr/5stuCUf4IC22QfhYAMItBy3XSjyzCa/oRG+oTTzYnx5VuPtPNHN4fZ0QRnKDg==
+"@types/nearley@^2.11.1":
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/@types/nearley/-/nearley-2.11.1.tgz#6ac3f57c00ca28071a1774ec72d2e45750f21420"
+  integrity sha512-oaAg5gn74VFpPYs6Ou2pjDao3WJxnlnH29q9rLOxSGb0PTw2QtBQcTAN9xs1OAHrtI9En5kIXKM96stf7//c9w==
 
 "@types/node@^12.6.8":
   version "12.6.8"
